@@ -1,0 +1,39 @@
+/* ==============================================================
+   Button - Rectangle
+   ============================================================== */
+
+@import "nib";
+
+//---------------------------------------------------------------
+// Base
+//---------------------------------------------------------------
+
+// ## Button - Rectangle `.btn-rect`
+// A rectangular button
+
+.btn-rect {
+  display: inline-block;
+  padding: 0.9em 0.9em;
+  background-color: #aaa;
+  color: #fff;
+  text-align: center;
+  text-transform: uppercase;
+  cursor: pointer;
+
+  &:active {
+    opacity: 0.7;
+  }
+}
+
+
+//---------------------------------------------------------------
+// Modifiers
+//---------------------------------------------------------------
+
+.btn-rect--work {
+  background-color: green;
+}
+
+.btn-rect--rest {
+  background-color: red;
+}
