@@ -1,0 +1,56 @@
+/* ==============================================================
+   Keypad
+   ============================================================== */
+
+@import "nib";
+
+//---------------------------------------------------------------
+// Base
+//---------------------------------------------------------------
+
+
+// ## Keypad `.keypad`
+// For entering durations
+
+.keypad {
+  display: block;
+  margin: 0 auto;
+  padding: 2em;
+  max-width: 22em;
+  width: 100%;
+}
+
+.keypad__display {
+  text-align: center;
+  margin-bottom: 0.6em;
+  typeset: 48, 1.6;
+}
+
+.keypad__digits {
+}
+
+.keypad__digits__digit {
+  display: inline-block;
+  margin-right: -0.2em;
+  width: 33.3%;
+  text-align: center;
+  cursor: pointer;
+  typeset: 16, 4em;
+  border-right: 1px solid #ddd;
+
+  &:nth-child(n+4) {
+    border-top: 1px solid #ddd;
+  }
+
+  &:nth-child(3n) {
+    border-right: 0
+  }
+
+  &:hover {
+    background-color: #eee;
+  }
+
+  &:active {
+    opacity: 0.6;
+  }
+}

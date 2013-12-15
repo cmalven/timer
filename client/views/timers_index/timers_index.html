@@ -1,0 +1,5 @@
+<template name="timers_index">
+  {{#each timers}}
+    <a href="{{pathFor 'timers_show'}}">{{name}} – {{created_at}}</a>
+  {{/each}}
+</template>

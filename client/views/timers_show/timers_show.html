@@ -1,0 +1,9 @@
+<template name="timers_show">
+  {{#with timer}}
+    <h1>{{name}}</h1>
+  {{/with}}
+
+  {{#each sets}}
+    {{> set}}
+  {{/each}}
+</template>

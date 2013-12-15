@@ -1,0 +1,86 @@
+/* ==============================================================
+   Step Button
+   ============================================================== */
+
+@import "nib";
+
+//---------------------------------------------------------------
+// Base
+//---------------------------------------------------------------
+
+
+// ## Step Button `.step-btn`
+// An item inside of a .set
+
+.step-btn {
+  display: inline-block;
+  width: 7em;
+  height: 7em;
+  border-radius: 1000em;
+  background-color: #ddd;
+  color: #fff;
+  text-decoration: none;
+  
+  &:hover {
+    text-decoration: none;
+  }
+
+  &:before {
+    display: inline-block;
+    margin-right: -0.3em;
+    width: 1%;
+    height: 100%;
+    content: "";
+    vertical-align: middle;
+  }
+}
+
+//
+// Sub-Modules
+//
+
+.step-btn__contents {
+  display: inline-block;
+  width: 99%;
+  vertical-align: middle;
+}
+
+.step-btn__contents__type {
+
+}
+
+.step-btn__contents__duration {
+
+}
+
+
+//---------------------------------------------------------------
+// Modifiers
+//---------------------------------------------------------------
+
+.step-btn--add {
+  border: 2px dashed #ccc;
+  background-color: #fff;
+  color: #ccc;
+
+  &:hover {
+    color: #444;
+    border-color: #444;
+  }
+}
+
+.step-btn--work {
+  background-color: green;
+
+  &:hover {
+    opacity: 0.8;
+  }
+}
+
+.step-btn--rest {
+  background-color: red;
+
+  &:hover {
+    opacity: 0.8;
+  }
+}
