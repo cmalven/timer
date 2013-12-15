@@ -6,6 +6,11 @@ Template.steps_add.helpers
   foo: ->
     return "You're in the steps_add view!"
 
+Template.steps_add.rendered = ->
+  unless @rendered
+    digitString = ''
+    @rendered = true
+
 Template.steps_add.events
   'click .js-duration-digit': (evt) ->
     value = $(evt.currentTarget).data 'value'
