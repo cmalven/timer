@@ -1,7 +1,5 @@
 <template name="steps_edit">
   <section class="edit-step">
-    <button class="btn-circle">Edit</button>
-
     {{#with step}}
       <div class="step-btn step-btn--big step-btn--{{type}}">
         <div class="step-btn__contents">
@@ -11,7 +9,7 @@
       </div>
     {{/with}}
 
-    <button class="btn-circle btn-circle--warning js-delete-step">Del</button>
+    <button class="btn-circle btn-circle--dark js-delete-step">Del</button>
     
     {{#with timer}}
       <a href="{{pathFor 'timers_show'}}" class="link-text">Cancel</a>
