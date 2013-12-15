@@ -2,7 +2,7 @@
   <div class="set">
 
     {{#each steps}}
-      <a href="" class="step-btn step-btn--{{type}}">
+      <a href="{{pathFor 'steps_edit'}}" class="step-btn step-btn--{{type}}">
         <div class="step-btn__contents">
           <p class="step-btn__contents__type">{{type}}</p>
           <p class="step-btn__contents__duration">{{formatMsAsMinSec duration}}</p>

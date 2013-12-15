@@ -12,3 +12,6 @@ Meteor.methods
       timer_id: timer_id
       set_id: set_id
     return Steps.insert opts
+
+  removeStep: (step_id) ->
+    return Steps.remove({_id: step_id})

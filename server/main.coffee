@@ -2,6 +2,7 @@ Meteor.startup ->
   # Bootstrap Collections
   if not Timers.find().count()
     timer_id = Meteor.call 'addTimer',
+      _id: 'gADbgtuXXAE3ZEMQd'
       name: 'Sample Timer'
       created_at: moment().format()
       is_started: false
