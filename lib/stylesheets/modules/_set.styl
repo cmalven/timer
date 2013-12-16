@@ -14,11 +14,42 @@
 
 .set {
   margin: 1.4em auto;
-  padding: 1.1em;
+  padding: 1.1em 0 0;
   max-width: 11em;
-  border: 1px solid #aaa;
+  border: 1px solid #ccc;
   border-radius: 6px;
   text-align: center;
+}
+
+//
+// Sub-Modules
+//
+
+.set__repeating {
+  clearfix();
+  margin-top: 2em;
+  border-top: 1px solid #ccc;
+}
+
+.set__repeating__update {
+  float: left;
+  width: 25%;
+  line-height: 40px;
+
+  &:first-child {
+    border-right: 1px solid #ccc;
+  }
+
+  &:active {
+    background-color: #eee;
+  }
+}
+
+.set__repeating__repeat-count {
+  float: left;
+  width: 50%;
+  line-height: 40px;
+  border-right: 1px solid #ccc;
 }
 
 //
