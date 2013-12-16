@@ -2,6 +2,7 @@
   "packages": {
     "iron-router": {},
     "fastclick": {},
-    "momentjs": {}
+    "momentjs": {},
+    "jquery-ui-sortable": {}
   }
 }

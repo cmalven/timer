@@ -1,14 +1,18 @@
 <template name="set">
   <div class="set">
-
-    {{#each steps}}
-      <a href="{{pathFor 'steps_edit'}}" class="step-btn step-btn--{{type}}">
-        <div class="step-btn__contents">
-          <p class="step-btn__contents__type">{{type}}</p>
-          <p class="step-btn__contents__duration">{{formatMsAsMinSec duration}}</p>
-        </div>
-      </a>
-    {{/each}}
+    
+    <ul class="set__steps js-sortable-steps">
+      {{#each steps}}
+        <li data-step-id="{{_id}}">
+          <a href="{{pathFor 'steps_edit'}}" class="step-btn step-btn--{{type}}">
+            <div class="step-btn__contents">
+              <p class="step-btn__contents__type">{{type}}</p>
+              <p class="step-btn__contents__duration">{{formatMsAsMinSec duration}}</p>
+            </div>
+          </a>
+        </li>
+      {{/each}}
+    </ul>
 
     <a href="{{pathFor 'steps_add'}}" class="step-btn step-btn--add">
       <div class="step-btn__contents">

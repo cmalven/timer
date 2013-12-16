@@ -15,10 +15,12 @@ Meteor.startup ->
     Meteor.call 'addStep', timer_id, set_id,
       type: 'work'
       duration: 20000
+      position: 0
 
     Meteor.call 'addStep', timer_id, set_id,
       type: 'rest'
       duration: 10000
+      position: 1
 
     # Second Set
     
@@ -28,7 +30,9 @@ Meteor.startup ->
     Meteor.call 'addStep', timer_id, set_id,
       type: 'work'
       duration: 30000
+      position: 0
 
     Meteor.call 'addStep', timer_id, set_id,
       type: 'rest'
       duration: 15000
+      position: 1

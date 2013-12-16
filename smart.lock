@@ -4,7 +4,8 @@
     "basePackages": {
       "iron-router": {},
       "fastclick": {},
-      "momentjs": {}
+      "momentjs": {},
+      "jquery-ui-sortable": {}
     },
     "packages": {
       "iron-router": {
@@ -21,6 +22,11 @@
         "git": "https://github.com/crapthings/meteor-momentjs.git",
         "tag": "v2.1.0.2",
         "commit": "59a762e297082eea8b8cae00374c2b7ac6f89529"
+      },
+      "jquery-ui-sortable": {
+        "git": "https://github.com/rgm/meteor-jquery-ui-sortable.git",
+        "tag": "v1.10.3",
+        "commit": "4423bd4b28cd81df91400a6bcb2a3d82e72894dc"
       }
     }
   }

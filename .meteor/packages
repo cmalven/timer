@@ -13,3 +13,4 @@ iron-router
 fastclick
 underscore
 momentjs
+jquery-ui-sortable

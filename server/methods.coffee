@@ -18,3 +18,6 @@ Meteor.methods
 
   removeStep: (step_id) ->
     return Steps.remove({_id: step_id})
+
+  updateStep: (step_id, opts) ->
+    return Steps.update {_id: step_id}, {$set: opts}
