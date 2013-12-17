@@ -3,6 +3,9 @@ Meteor.methods
   addTimer: (opts) ->
     return Timers.insert opts
 
+  updateTimer: (timer_id, opts) ->
+    return Timers.update {_id: timer_id}, {$set: opts}
+
   updateSet: (set_id, opts) ->
     return Sets.update {_id: set_id}, {$set: opts}
 
