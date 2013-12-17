@@ -14,9 +14,11 @@ Meteor.methods
     return Sets.insert opts
 
   addStep: (timer_id, set_id, opts) ->
+    stepCount = Steps.find({set_id: set_id}).count()
     opts = _.extend opts,
       timer_id: timer_id
       set_id: set_id
+      position: stepCount
     return Steps.insert opts
 
   removeStep: (step_id) ->
