@@ -5,7 +5,8 @@ Meteor.startup ->
       _id: 'gADbgtuXXAE3ZEMQd'
       name: 'Sample Timer'
       created_at: moment().format()
-      is_started: false
+      is_active: false
+      current_time: 0
 
     # First Set
 
