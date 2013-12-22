@@ -1,16 +1,9 @@
 <template name="timers_show">
-
-  {{#if timer.started_at}}
-    {{> active_timer}}
-  {{else}}
-    {{#with timer}}
-      <h1>{{name}}</h1>
-    {{/with}}
-
-    {{#each sets}}
-      {{> set}}
-    {{/each}}
-
-    <button class="link-text js-timer-play">Play</button>
-  {{/if}}
+  {{#each sets}}
+    {{> set}}
+  {{/each}}
+  
+  {{#with timer}}
+    <a href="{{pathFor 'timers_active'}}" class="link-text">Play</a>
+  {{/with}}
 </template>

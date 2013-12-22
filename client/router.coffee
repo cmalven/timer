@@ -30,6 +30,22 @@ Router.map ->
         steps: Steps.find()
       }
 
+  @route 'timers_active',
+    path: '/timer/:_id/active',
+    template: 'timers_active'
+    waitOn: ->
+      return [
+        Meteor.subscribe('timers')
+        Meteor.subscribe('sets', @params._id)
+        Meteor.subscribe('steps', @params._id)
+      ]
+    data: ->
+      {
+        timer: Timers.findOne({_id: @params._id})
+        sets: Sets.find()
+        steps: Steps.find()
+      }
+
   @route 'steps_add',
     path: '/timer/:timer_id/set/:_id/add',
     template: 'steps_add'

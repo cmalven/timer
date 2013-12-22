@@ -1,0 +1,9 @@
+<template name="timers_active">
+  {{#with timer}}
+    <button class="link-text js-timer-play">Play</button>
+    <button class="link-text js-timer-pause">Pause</button>
+    <button class="link-text js-timer-reset">Reset</button>
+  {{/with}}
+
+  {{formatMsAsMinSec current_time}}
+</template>

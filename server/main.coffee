@@ -6,7 +6,7 @@ Meteor.startup ->
       name: 'Sample Timer'
       created_at: moment().format()
       is_active: false
-      current_time: 0
+      started_at: null
 
     # First Set
 
