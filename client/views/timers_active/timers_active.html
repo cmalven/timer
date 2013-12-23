@@ -1,7 +1,7 @@
 <template name="timers_active">
   {{#with timer}}
-    <button class="link-text js-timer-play">Play</button>
-    <button class="link-text js-timer-pause">Pause</button>
+    <button class="link-text js-timer-play" {{#if is_active}}disabled{{/if}}>Play</button>
+    <button class="link-text js-timer-pause" {{#unless is_active}}disabled{{/unless}}>Pause</button>
     <button class="link-text js-timer-reset">Reset</button>
   {{/with}}
 
