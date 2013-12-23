@@ -1,4 +1,4 @@
-timerInterval = null
+timekeeper = null
 
 Template.timers_active.helpers
 
@@ -8,37 +8,9 @@ Template.timers_active.helpers
 
 Template.timers_active.rendered = ->
   unless @rendered
-    timer = Timers.find(@data.timer._id)
-
-    # Update the state of the timer whenver the model changes
-    timer.observeChanges
-      added: timerUpdated
-      added: updateTimer
-      changed: timerUpdated
+    timekeeper = new Timekeeper
+      timer: Timers.find(@data.timer._id)
     @rendered = true
-
-timerUpdated = (id, fields) =>
-  if fields.is_active
-    console.log 'starting timer!'
-    startInterval id
-  else
-    console.log 'stopping timer!'
-    Meteor.clearInterval(timerInterval)
-    if fields.started_at is null
-      Session.set('current_timer_time', 0) 
-
-startInterval = (timerId) ->
-  timerInterval = Meteor.setInterval(
-    =>
-      updateTimer timerId
-  , 1000)
-
-updateTimer = (timerId) ->
-  timer = Timers.findOne(timerId)
-  timeInMs = timer.elapsed_time_in_ms
-  if timer.is_active
-    timeInMs += moment().diff(timer.started_at, 'milliseconds')
-  Session.set('current_timer_time', timeInMs)
 
 Template.timers_active.events
   'click .js-timer-play': (evt) ->
