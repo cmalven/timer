@@ -8,9 +8,12 @@ Template.timers_active.helpers
 
 Template.timers_active.rendered = ->
   unless @rendered
+    timer = Timers.find(@data.timer._id)
+
     # Update the state of the timer whenver the model changes
-    Timers.find(@data.timer._id).observeChanges
+    timer.observeChanges
       added: timerUpdated
+      added: updateTimer
       changed: timerUpdated
     @rendered = true
 
@@ -27,13 +30,15 @@ timerUpdated = (id, fields) =>
 startInterval = (timerId) ->
   timerInterval = Meteor.setInterval(
     =>
-      onInterval timerId
+      updateTimer timerId
   , 1000)
 
-onInterval = (timerId) ->
+updateTimer = (timerId) ->
   timer = Timers.findOne(timerId)
-  timeInMs = moment().diff(timer.started_at, 'milliseconds')
-  Session.set('current_timer_time', timeInMs + timer.elapsed_time_in_ms)
+  timeInMs = timer.elapsed_time_in_ms
+  if timer.is_active
+    timeInMs += moment().diff(timer.started_at, 'milliseconds')
+  Session.set('current_timer_time', timeInMs)
 
 Template.timers_active.events
   'click .js-timer-play': (evt) ->
