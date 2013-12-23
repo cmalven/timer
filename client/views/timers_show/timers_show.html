@@ -3,7 +3,9 @@
     {{> set}}
   {{/each}}
   
-  {{#with timer}}
-    <a href="{{pathFor 'timers_active'}}" class="link-text">Play</a>
-  {{/with}}
+  <footer class="timer-controls">
+    {{#with timer}}
+      <a href="{{pathFor 'timers_active'}}" class="link-text">Play</a>
+    {{/with}}
+  </footer>
 </template>
