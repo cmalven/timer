@@ -25,15 +25,15 @@ timerUpdated = (id, fields) =>
       Session.set('current_timer_time', 0) 
 
 startInterval = (timerId) ->
-  timer = Timers.findOne(timerId)
-  startedAt = timer.started_at
-  # Update the local time every second
   timerInterval = Meteor.setInterval(
     =>
-      startedTime = startedAt
-      timeInMs = moment().diff(startedTime, 'milliseconds')
-      Session.set('current_timer_time', timeInMs + timer.elapsed_time_in_ms)
+      onInterval timerId
   , 1000)
+
+onInterval = (timerId) ->
+  timer = Timers.findOne(timerId)
+  timeInMs = moment().diff(timer.started_at, 'milliseconds')
+  Session.set('current_timer_time', timeInMs + timer.elapsed_time_in_ms)
 
 Template.timers_active.events
   'click .js-timer-play': (evt) ->
