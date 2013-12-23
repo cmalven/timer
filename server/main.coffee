@@ -7,7 +7,8 @@ Meteor.startup ->
       created_at: moment().format()
       is_active: false
       started_at: null
-
+      elapsed_time_in_ms: 0
+      
     # First Set
 
     set_id = Meteor.call 'addSet', timer_id,
