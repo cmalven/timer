@@ -23,11 +23,11 @@ class root.Timekeeper
       console.log 'stopping timer!'
       Meteor.clearInterval(@timerInterval)
       if fields.started_at is null
-        Session.set('current_timer_time', 0)
+        Session.set("#{@timer._id}_current_timer_time", 0)
 
   _updateTimerTime: (timerId) ->
     timer = Timers.findOne(timerId)
     timeInMs = timer.elapsed_time_in_ms
     if timer.is_active
       timeInMs += moment().diff(timer.started_at, 'milliseconds')
-    Session.set('current_timer_time', timeInMs)
+    Session.set("#{timer._id}_current_timer_time", timeInMs)
