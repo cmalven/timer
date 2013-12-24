@@ -3,6 +3,7 @@
     "iron-router": {},
     "fastclick": {},
     "momentjs": {},
-    "jquery-ui-sortable": {}
+    "jquery-ui-sortable": {},
+    "chartjs": {}
   }
 }
