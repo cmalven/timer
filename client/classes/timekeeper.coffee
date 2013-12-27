@@ -18,6 +18,12 @@ class root.Timekeeper
       currentTime = Session.get("#{@timer.selector_id}_current_timer_time")
       @_updateChart()
 
+      # Calculate the total timer time
+      timerSteps = Steps.find()
+      @totalTimerTime = _.reduce(timerSteps.fetch(), (memo, step) =>
+        return memo + step.duration
+      , 0)
+
   _updateTimerState: (id, fields) =>
     if fields.is_active
       console.log 'starting timer!'
@@ -40,8 +46,7 @@ class root.Timekeeper
 
   _updateChart: =>
     currentTime = Session.get("#{@timer.selector_id}_current_timer_time")
-    totalTime = 40000
-    timePct = (currentTime / totalTime) * 100
+    timePct = (currentTime / @totalTimerTime) * 100
 
     data = [
       {
