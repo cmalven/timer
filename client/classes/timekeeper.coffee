@@ -19,10 +19,13 @@ class root.Timekeeper
       @_updateChart()
 
       # Calculate the total timer time
-      timerSteps = Steps.find()
-      @totalTimerTime = _.reduce(timerSteps.fetch(), (memo, step) =>
-        return memo + step.duration
-      , 0)
+      @_getTotalTimerLength()
+
+  _getTotalTimerLength: =>
+    timerSteps = Steps.find()
+    @totalTimerTime = _.reduce(timerSteps.fetch(), (memo, step) =>
+      return memo + step.duration
+    , 0)
 
   _updateTimerState: (id, fields) =>
     if fields.is_active
