@@ -3,7 +3,7 @@ root = exports ? this
 class root.Timekeeper
 
   constructor: (@options) ->
-    @timer = @options.timer
+    @timer = Timers.find @options.timerId
     @timerInterval = null
     @updateInterval = 1000
 
@@ -12,6 +12,11 @@ class root.Timekeeper
       added: @_updateTimerState
       added: @_updateTimerTime
       changed: @_updateTimerState
+
+    # Listen for session to change
+    Deps.autorun =>
+      currentTime = Session.get("#{@timer.selector_id}_current_timer_time")
+      @_updateChart()
 
   _updateTimerState: (id, fields) =>
     if fields.is_active
@@ -32,7 +37,6 @@ class root.Timekeeper
     if timer.is_active
       timeInMs += moment().diff(timer.started_at, 'milliseconds')
     Session.set("#{timer._id}_current_timer_time", timeInMs)
-    @_updateChart()
 
   _updateChart: =>
     currentTime = Session.get("#{@timer.selector_id}_current_timer_time")
@@ -53,32 +57,23 @@ class root.Timekeeper
     options = {
       # Boolean - Whether we should show a stroke on each segment
       segmentShowStroke : true,
-      
       # String - The colour of each segment stroke
       segmentStrokeColor : "#fff",
-      
       # Number - The width of each segment stroke
       segmentStrokeWidth : 2,
-      
       # The percentage of the chart that we cut out of the middle.
       percentageInnerCutout : 80,
-      
       # Boolean - Whether we should animate the chart 
       # animation : true,
       animation : false,
-      
       # Number - Amount of animation steps
       animationSteps : 100,
-      
       # String - Animation easing effect
       animationEasing : "easeOutBounce",
-      
       # Boolean - Whether we animate the rotation of the Doughnut
       animateRotate : true,
-
       # Boolean - Whether we animate scaling the Doughnut from the centre
       animateScale : false,
-      
       # Function - Will fire on animation completion.
       onAnimationComplete : null
     }

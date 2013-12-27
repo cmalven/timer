@@ -9,7 +9,7 @@ Template.timers_active.helpers
 Template.timers_active.rendered = ->
   unless @rendered
     timekeeper = new Timekeeper
-      timer: Timers.find(@data.timer._id)
+      timerId: @data.timer._id
     @rendered = true
 
 Template.timers_active.events
