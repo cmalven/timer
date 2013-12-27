@@ -16,14 +16,18 @@ class root.Timekeeper
     # Listen for session to change
     Deps.autorun =>
       currentTime = Session.get("#{@timer.selector_id}_current_timer_time")
-      @_updateChart()
+
+      # Update current step time
+      @_updateCurrentStepTime(currentTime)
+
+      # Update the chart graphic
+      @_updateChart(currentTime)
 
       # Calculate the total timer time
       @_getTotalTimerLength()
 
   _getTotalTimerLength: =>
-    timerSteps = Steps.find()
-    @totalTimerTime = _.reduce(timerSteps.fetch(), (memo, step) =>
+    @totalTimerTime = _.reduce(Steps.find().fetch(), (memo, step) =>
       return memo + step.duration
     , 0)
 
@@ -47,9 +51,11 @@ class root.Timekeeper
       timeInMs += moment().diff(timer.started_at, 'milliseconds')
     Session.set("#{timer._id}_current_timer_time", timeInMs)
 
-  _updateChart: =>
-    currentTime = Session.get("#{@timer.selector_id}_current_timer_time")
-    timePct = (currentTime / @totalTimerTime) * 100
+  _updateChart: (currentTime) =>
+    currentStep = @_getCurrentStep currentTime
+    timeBeforeStep = @_getTimeBeforeStep currentStep.position
+    elapsedTimeForStep = currentTime - timeBeforeStep
+    timePct = (elapsedTimeForStep / currentStep.duration) * 100
 
     data = [
       {
@@ -88,3 +94,27 @@ class root.Timekeeper
 
     @chartCanvas = $('.js-active-timer-canvas').get(0).getContext('2d')
     @chart = new Chart(@chartCanvas).Doughnut(data, options)
+
+  _getTimeBeforeStep: (currentStepPosition) =>
+    time = _.reduce(Steps.find().fetch(), (memo, step) =>
+      if step.position < currentStepPosition
+        return memo + step.duration
+      else
+        return memo
+    , 0)
+    return time
+
+  _getCurrentStep: (currentTime) =>
+    timeSearched = 0
+    return currentStepIndex = _.find Steps.find().fetch(), (step) =>
+      return false if currentTime < timeSearched
+      timeSearched += step.duration
+      return false if currentTime > timeSearched
+      return true
+
+  _updateCurrentStepTime: (currentTime) =>
+    currentStep = @_getCurrentStep currentTime
+    currentStepPosition = currentStep.position
+    timeBefore = @_getTimeBeforeStep currentStepPosition
+    timeForStep = currentTime - timeBefore
+    Session.set('current_timer_time', timeForStep)

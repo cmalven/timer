@@ -3,7 +3,7 @@ timekeeper = null
 Template.timers_active.helpers
 
   current_time: ->
-    currentTime = Session.get("#{@timer._id}_current_timer_time")
+    currentTime = Session.get('current_timer_time')
     return if currentTime then currentTime else 0
 
 Template.timers_active.rendered = ->
