@@ -17,29 +17,23 @@ class root.Timekeeper
     Deps.autorun =>
       currentTime = Session.get("#{@timer.selector_id}_current_timer_time")
 
+      # Update current set and step
+      @currentSet = @_getCurrentSet currentTime
+      @currentStep = @_getCurrentStep currentTime
+
       # Update current step time
-      @_updateCurrentStepTime(currentTime)
+      @_updateCurrentStepTime currentTime
 
       # Update the chart graphic
-      @_updateChart(currentTime)
-
-      # Calculate the total timer time
-      @_getTotalTimerLength()
-
-  _getTotalTimerLength: =>
-    @totalTimerTime = _.reduce(Steps.find().fetch(), (memo, step) =>
-      return memo + step.duration
-    , 0)
+      @_updateChart currentTime
 
   _updateTimerState: (id, fields) =>
     if fields.is_active
-      console.log 'starting timer!'
       @timerInterval = Meteor.setInterval(
         =>
           @_updateTimerTime id
       , @updateInterval)
     else
-      console.log 'stopping timer!'
       Meteor.clearInterval(@timerInterval)
       if fields.started_at is null
         Session.set("#{@timer.selector_id}_current_timer_time", 0)
@@ -49,18 +43,63 @@ class root.Timekeeper
     timeInMs = timer.elapsed_time_in_ms
     if timer.is_active
       timeInMs += moment().diff(timer.started_at, 'milliseconds')
-    Session.set("#{timer._id}_current_timer_time", timeInMs)
+      roundedTime = @_roundToThousand timeInMs
+      console.log 'roundedTime', roundedTime
+    Session.set("#{timer._id}_current_timer_time", roundedTime)
+
+  _updateCurrentStepTime: (currentTime) =>
+    currentStepPosition = @currentStep.position
+    timeBefore = @_getTimeBeforeStep currentStepPosition, currentTime
+    timeForStep = currentTime - timeBefore
+    Session.set('current_timer_time', timeForStep)
+
+  _getCurrentSet: (currentTime) =>
+    timeSearched = 0
+    return currentSet = _.find Sets.find().fetch(), (set) =>
+      totalSetDuration = @_getSetDuration set
+      return false if currentTime < timeSearched
+      timeSearched += totalSetDuration
+      return false if currentTime > timeSearched
+      return true
+
+  _getSetDuration: (setCursor) =>
+    setSteps = @_getStepsForSet setCursor
+    return totalSetDuration = _.reduce(setSteps.fetch(), (memo, step) =>
+      return memo + step.duration
+    , 0)
+
+  _getStepsForSet: (setCursor) =>
+    return setSteps = Steps.find
+      set_id: setCursor._id
+
+  _getTimeBeforeStep: (currentStepPosition, currentTime) =>
+    stepsForSet = @_getStepsForSet @currentSet
+    time = _.reduce(stepsForSet.fetch(), (memo, step) =>
+      if step.position < currentStepPosition
+        return memo + step.duration
+      else
+        return memo
+    , 0)
+    return @_roundToThousand time
+
+  _getCurrentStep: (currentTime) =>
+    stepsForSet = @_getStepsForSet @currentSet
+    timeSearched = 0
+    return currentStep = _.find stepsForSet.fetch(), (step) =>
+      return false if currentTime < timeSearched
+      timeSearched += step.duration
+      return false if currentTime > timeSearched
+      return true
 
   _updateChart: (currentTime) =>
-    currentStep = @_getCurrentStep currentTime
-    timeBeforeStep = @_getTimeBeforeStep currentStep.position
+    timeBeforeStep = @_getTimeBeforeStep @currentStep.position, currentTime
     elapsedTimeForStep = currentTime - timeBeforeStep
-    timePct = (elapsedTimeForStep / currentStep.duration) * 100
+    timePct = (elapsedTimeForStep / @currentStep.duration) * 100
 
     data = [
       {
         value : timePct,
-        color : "#F7464A"
+        color : @_getStepColor @currentStep.type
       },
       {
         value : 100 - timePct,
@@ -69,52 +108,23 @@ class root.Timekeeper
     ]
 
     options = {
-      # Boolean - Whether we should show a stroke on each segment
       segmentShowStroke : true,
-      # String - The colour of each segment stroke
       segmentStrokeColor : "#fff",
-      # Number - The width of each segment stroke
       segmentStrokeWidth : 2,
-      # The percentage of the chart that we cut out of the middle.
       percentageInnerCutout : 80,
-      # Boolean - Whether we should animate the chart 
-      # animation : true,
       animation : false,
-      # Number - Amount of animation steps
       animationSteps : 100,
-      # String - Animation easing effect
       animationEasing : "easeOutBounce",
-      # Boolean - Whether we animate the rotation of the Doughnut
       animateRotate : true,
-      # Boolean - Whether we animate scaling the Doughnut from the centre
       animateScale : false,
-      # Function - Will fire on animation completion.
       onAnimationComplete : null
     }
 
     @chartCanvas = $('.js-active-timer-canvas').get(0).getContext('2d')
     @chart = new Chart(@chartCanvas).Doughnut(data, options)
 
-  _getTimeBeforeStep: (currentStepPosition) =>
-    time = _.reduce(Steps.find().fetch(), (memo, step) =>
-      if step.position < currentStepPosition
-        return memo + step.duration
-      else
-        return memo
-    , 0)
-    return time
+  _getStepColor: (stepType) =>
+    return if stepType is 'work' then 'green' else 'red'
 
-  _getCurrentStep: (currentTime) =>
-    timeSearched = 0
-    return currentStepIndex = _.find Steps.find().fetch(), (step) =>
-      return false if currentTime < timeSearched
-      timeSearched += step.duration
-      return false if currentTime > timeSearched
-      return true
-
-  _updateCurrentStepTime: (currentTime) =>
-    currentStep = @_getCurrentStep currentTime
-    currentStepPosition = currentStep.position
-    timeBefore = @_getTimeBeforeStep currentStepPosition
-    timeForStep = currentTime - timeBefore
-    Session.set('current_timer_time', timeForStep)
+  _roundToThousand: (number) =>
+    Math.round(number / 1000) * 1000
