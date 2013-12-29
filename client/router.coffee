@@ -33,6 +33,7 @@ Router.map ->
   @route 'timers_active',
     path: '/timer/:_id/active',
     template: 'timers_active'
+    layoutTemplate: 'layout_dark'
     waitOn: ->
       return [
         Meteor.subscribe('timers')

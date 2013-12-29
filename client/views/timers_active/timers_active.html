@@ -1,4 +1,10 @@
 <template name="timers_active">
+  <div class="timer-preview">
+    {{#each sets}}
+      {{> timer_preview_set}}
+    {{/each}}
+  </div>
+
   {{#with timer}}
     <button class="link-text js-timer-play" {{#if is_active}}disabled{{/if}}>Play</button>
     <button class="link-text js-timer-pause" {{#unless is_active}}disabled{{/unless}}>Pause</button>

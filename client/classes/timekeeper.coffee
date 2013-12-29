@@ -15,7 +15,7 @@ class root.Timekeeper
 
     # Listen for session to change
     Deps.autorun =>
-      currentTime = Session.get("#{@timer.selector_id}_current_timer_time")
+      currentTime = Session.get("current_timer_time")
 
       # Update current set and step
       @currentSet = @_getCurrentSet currentTime
@@ -36,7 +36,7 @@ class root.Timekeeper
     else
       Meteor.clearInterval(@timerInterval)
       if fields.started_at is null
-        Session.set("#{@timer.selector_id}_current_timer_time", 0)
+        Session.set("current_timer_time", 0)
 
   _updateTimerTime: (id) =>
     timer = Timers.findOne(id)
@@ -44,33 +44,64 @@ class root.Timekeeper
     if timer.is_active
       timeInMs += moment().diff(timer.started_at, 'milliseconds')
       roundedTime = @_roundToThousand timeInMs
-      console.log 'roundedTime', roundedTime
-    Session.set("#{timer._id}_current_timer_time", roundedTime)
+    Session.set("current_timer_time", roundedTime)
 
   _updateCurrentStepTime: (currentTime) =>
     currentStepPosition = @currentStep.position
     timeBefore = @_getTimeBeforeStep currentStepPosition, currentTime
-    timeForStep = currentTime - timeBefore
-    Session.set('current_timer_time', timeForStep)
+    elapsedTimeForStep = currentTime - timeBefore
+    Session.set('current_step_time', elapsedTimeForStep)
+
+    # Announce if the step is over
+    if @currentStep.duration is elapsedTimeForStep
+      console.log 'Step Ended!'
+      # Is the last step of a set?
+      if @_isLastStepOfSet()
+        console.log 'Set Ended!'
+      # Is the last step of the timer?
+      if @_isLastStepOfTimer()
+        console.log 'Timer Ended!'
+        Meteor.call 'updateTimer', @timer._id,
+          is_active: false
+
+  _isLastStepOfSet: =>
+    setSteps = @_getStepsForSet @currentSet
+    return true unless @currentStep.position < setSteps.count() - 1
+
+  _isLastStepOfTimer: =>
+    return true unless @currentStep.position < Steps.find().count() - 1
 
   _getCurrentSet: (currentTime) =>
     timeSearched = 0
-    return currentSet = _.find Sets.find().fetch(), (set) =>
+    currentSet = _.find Sets.find().fetch(), (set) =>
       totalSetDuration = @_getSetDuration set
       return false if currentTime < timeSearched
       timeSearched += totalSetDuration
       return false if currentTime > timeSearched
       return true
+    Session.set 'current_set', currentSet._id
+    return currentSet
+
+  _getCurrentStep: (currentTime) =>
+    stepsForSet = @_getStepsForSet @currentSet
+    timeSearched = @_getTimeBeforeSet @currentSet
+    currentStep = _.find stepsForSet.fetch(), (step) =>
+      return false if currentTime < timeSearched
+      timeSearched += step.duration
+      return false if currentTime > timeSearched
+      return true
+    Session.set 'current_step', currentStep._id
+    return currentStep
+
+  _getStepsForSet: (setCursor) =>
+    return setSteps = Steps.find
+      set_id: setCursor._id
 
   _getSetDuration: (setCursor) =>
     setSteps = @_getStepsForSet setCursor
     return totalSetDuration = _.reduce(setSteps.fetch(), (memo, step) =>
       return memo + step.duration
     , 0)
-
-  _getStepsForSet: (setCursor) =>
-    return setSteps = Steps.find
-      set_id: setCursor._id
 
   _getTimeBeforeStep: (currentStepPosition, currentTime) =>
     stepsForSet = @_getStepsForSet @currentSet
@@ -82,14 +113,15 @@ class root.Timekeeper
     , 0)
     return @_roundToThousand time
 
-  _getCurrentStep: (currentTime) =>
-    stepsForSet = @_getStepsForSet @currentSet
-    timeSearched = 0
-    return currentStep = _.find stepsForSet.fetch(), (step) =>
-      return false if currentTime < timeSearched
-      timeSearched += step.duration
-      return false if currentTime > timeSearched
-      return true
+  _getTimeBeforeSet: (setCursor) =>
+    time = _.reduce(Steps.find().fetch(), (memo, step) =>
+      set = Sets.findOne(step.set_id)
+      if set.position < setCursor.position
+        return memo + step.duration
+      else
+        return memo
+    , 0)
+    return @_roundToThousand time
 
   _updateChart: (currentTime) =>
     timeBeforeStep = @_getTimeBeforeStep @currentStep.position, currentTime
@@ -103,15 +135,15 @@ class root.Timekeeper
       },
       {
         value : 100 - timePct,
-        color : "#E2EAE9"
+        color : "#2e2e2e"
       }
     ]
 
     options = {
       segmentShowStroke : true,
-      segmentStrokeColor : "#fff",
-      segmentStrokeWidth : 2,
-      percentageInnerCutout : 80,
+      segmentStrokeColor : "#1a1718",
+      segmentStrokeWidth : 1,
+      percentageInnerCutout : 95,
       animation : false,
       animationSteps : 100,
       animationEasing : "easeOutBounce",

@@ -1,0 +1,93 @@
+/* ==============================================================
+   Timer Prevew
+   ============================================================== */
+
+@import "nib";
+
+//---------------------------------------------------------------
+// Base
+//---------------------------------------------------------------
+
+
+// ## Timer Preview `.timer-preview`
+// Previews the current state of an active timer
+
+.timer-preview {
+  text-align: center;
+}
+
+//
+// Sub-Modules
+// 
+
+.timer-preview__set {
+  display: inline-block;
+  margin: 0 2px;
+}
+
+.timer-preview__set__steps {
+  display: inline-block;
+  padding: 2px 7px;
+  border: 1px solid rgba(#fff, 0.18);
+  border-radius: 6px;
+}
+
+.timer-preview__set__steps__step {
+  position: relative;
+  display: inline-block;
+  margin: 0 2px;
+  width: 9px;
+  height: 9px;
+  border-radius: 50%;
+}
+
+.timer-preview__set__steps__step--work {
+  background-color: green;
+}
+
+.timer-preview__set__steps__step--rest {
+  background-color: red;
+}
+
+.timer-preview__set__repeat-count {
+  color: rgba(#fff, 0.2);
+  letter-spacing: 1px;
+  typeset: 9, 3;
+}
+
+//---------------------------------------------------------------
+// States
+//---------------------------------------------------------------
+
+
+.timer-preview__set__steps__step {
+  
+  &.is-current {
+    
+    &:after {
+      position: absolute;
+      top: 2px;
+      right: 2px;
+      bottom: 2px;
+      left: 2px;
+      display: block;
+      background-color: #000;
+      content: "";
+      border-radius: 50%;
+    }
+  }
+}
+
+.timer-preview__set {
+  
+  &.is-current {
+    
+    .timer-preview__set__steps {
+      border-color: #fff;
+    }
+
+    .timer-preview__set__repeat-count {
+      color: #fff;
+    }
+  }
+}
