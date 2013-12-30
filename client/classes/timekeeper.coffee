@@ -7,14 +7,23 @@ class root.Timekeeper
     @timerInterval = null
     @updateInterval = 1000
 
-    # Update the state of the timer whenver the model changes
+    # Update the state of the timer/sets/steps whenver they change
     @timer.observeChanges
       added: @_updateTimerState
       added: @_updateTimerTime
       changed: @_updateTimerState
 
-    # Create the timeline
-    # XXX: Need to rebuild this whenever sets or steps change
+    Sets.find().observeChanges
+      added: @_buildTimeline
+      changed: @_buildTimeline
+      removed: @_buildTimeline
+
+    Steps.find().observeChanges
+      added: @_buildTimeline
+      changed: @_buildTimeline
+      removed: @_buildTimeline
+
+    # Create the initial timeline
     @timeline = @_buildTimeline()
 
     # Listen for session to change
@@ -121,27 +130,11 @@ class root.Timekeeper
     return setSteps = Steps.find
       set_id: setCursor._id
 
-  _getSetDuration: (setCursor) =>
-    setSteps = @_getStepsForSet setCursor
-    return totalSetDuration = _.reduce(setSteps.fetch(), (memo, step) =>
-      return memo + step.duration
-    , 0)
-
   _getTimeBeforeStep: (currentTime) =>
     set = @_getSetForTime currentTime
     step = @_getStepForTime currentTime
     timeBefore = step.min
     return @_roundToThousand timeBefore
-
-  _getTimeBeforeSet: (setCursor) =>
-    time = _.reduce(Steps.find().fetch(), (memo, step) =>
-      set = Sets.findOne(step.set_id)
-      if set.position < setCursor.position
-        return memo + step.duration
-      else
-        return memo
-    , 0)
-    return @_roundToThousand time
 
   _updateChart: (currentTime) =>
     timeBeforeStep = @_getTimeBeforeStep currentTime
