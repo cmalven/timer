@@ -13,19 +13,49 @@ class root.Timekeeper
       added: @_updateTimerTime
       changed: @_updateTimerState
 
+    # Create the timeline
+    # XXX: Need to rebuild this whenever sets or steps change
+    @timeline = @_buildTimeline()
+
     # Listen for session to change
     Deps.autorun =>
       currentTime = Session.get("current_timer_time")
 
       # Update current set and step
-      @currentSet = @_getCurrentSet currentTime
-      @currentStep = @_getCurrentStep currentTime
+      @currentSet = @_getSetForTime currentTime
+      @currentStep = @_getStepForTime currentTime
 
       # Update current step time
       @_updateCurrentStepTime currentTime
 
       # Update the chart graphic
       @_updateChart currentTime
+
+  _buildTimeline: =>
+    elapsedTime = 0
+    sets = []
+
+    Sets.find().forEach (set) =>
+      i = set.repeats
+      while i--
+        setObj = {}
+        setObj.min = elapsedTime
+        setObj._id = set._id
+        setObj.steps = []
+
+        Steps.find({set_id: set._id}).forEach (step) =>
+          stepObj = {}
+          stepObj.min = elapsedTime
+          stepObj._id = step._id
+          stepObj.type = step.type
+          elapsedTime += step.duration
+          stepObj.max = elapsedTime
+          stepObj.duration = step.duration
+          setObj.steps.push stepObj
+
+        setObj.max = elapsedTime
+        sets.push setObj
+    return sets
 
   _updateTimerState: (id, fields) =>
     if fields.is_active
@@ -47,8 +77,7 @@ class root.Timekeeper
     Session.set("current_timer_time", roundedTime)
 
   _updateCurrentStepTime: (currentTime) =>
-    currentStepPosition = @currentStep.position
-    timeBefore = @_getTimeBeforeStep currentStepPosition, currentTime
+    timeBefore = @_getTimeBeforeStep currentTime
     elapsedTimeForStep = currentTime - timeBefore
     Session.set('current_step_time', elapsedTimeForStep)
 
@@ -71,24 +100,19 @@ class root.Timekeeper
   _isLastStepOfTimer: =>
     return true unless @currentStep.position < Steps.find().count() - 1
 
-  _getCurrentSet: (currentTime) =>
-    timeSearched = 0
-    currentSet = _.find Sets.find().fetch(), (set) =>
-      totalSetDuration = @_getSetDuration set
-      return false if currentTime < timeSearched
-      timeSearched += totalSetDuration
-      return false if currentTime > timeSearched
+  _getSetForTime: (currentTime) =>
+    currentSet = _.find @timeline, (set) =>
+      return false if currentTime < set.min
+      return false if currentTime > set.max
       return true
     Session.set 'current_set', currentSet._id
     return currentSet
 
-  _getCurrentStep: (currentTime) =>
-    stepsForSet = @_getStepsForSet @currentSet
-    timeSearched = @_getTimeBeforeSet @currentSet
-    currentStep = _.find stepsForSet.fetch(), (step) =>
-      return false if currentTime < timeSearched
-      timeSearched += step.duration
-      return false if currentTime > timeSearched
+  _getStepForTime: (currentTime) =>
+    set = _.where @timeline, {_id: @currentSet._id}
+    currentStep = _.find set[0].steps, (step) =>
+      return false if currentTime < step.min
+      return false if currentTime > step.max
       return true
     Session.set 'current_step', currentStep._id
     return currentStep
@@ -103,15 +127,11 @@ class root.Timekeeper
       return memo + step.duration
     , 0)
 
-  _getTimeBeforeStep: (currentStepPosition, currentTime) =>
-    stepsForSet = @_getStepsForSet @currentSet
-    time = _.reduce(stepsForSet.fetch(), (memo, step) =>
-      if step.position < currentStepPosition
-        return memo + step.duration
-      else
-        return memo
-    , 0)
-    return @_roundToThousand time
+  _getTimeBeforeStep: (currentTime) =>
+    set = @_getSetForTime currentTime
+    step = @_getStepForTime currentTime
+    timeBefore = step.min
+    return @_roundToThousand timeBefore
 
   _getTimeBeforeSet: (setCursor) =>
     time = _.reduce(Steps.find().fetch(), (memo, step) =>
@@ -124,7 +144,7 @@ class root.Timekeeper
     return @_roundToThousand time
 
   _updateChart: (currentTime) =>
-    timeBeforeStep = @_getTimeBeforeStep @currentStep.position, currentTime
+    timeBeforeStep = @_getTimeBeforeStep currentTime
     elapsedTimeForStep = currentTime - timeBeforeStep
     timePct = (elapsedTimeForStep / @currentStep.duration) * 100
 
