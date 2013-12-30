@@ -1,0 +1,52 @@
+/* ==============================================================
+   Timer Readout
+   ============================================================== */
+
+@import "nib";
+
+//---------------------------------------------------------------
+// Base
+//---------------------------------------------------------------
+
+
+// ## Timer Readout `.timer-readout`
+// The main time readout for an active timer
+
+.timer-readout {
+  position: relative;
+  width: 200px;
+  height: 200px;
+  display: block;
+  margin: 2em auto;
+}
+
+//
+// Sub-Modules
+//
+
+.timer-readout__details {
+  position: absolute;
+  text-align: center;
+  margin: auto;
+  height: 45%;
+  top: 0;
+  right: 0;
+  bottom: 0;
+  left: 0;
+}
+
+.timer-readout__details__type {
+  color: #fff;
+  typeset: 14, 1;
+  text-transform: uppercase;
+}
+
+.timer-readout__details__time {
+  color: #fff;
+  typeset: 42, 2;
+  letter-spacing: 5px;
+}
+
+.timer-readout__graph {
+  
+}

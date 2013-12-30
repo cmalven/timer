@@ -1,0 +1,12 @@
+<template name="timer_readout">
+  <div class="timer-readout">
+    <div class="timer-readout__details">
+      <p class="timer-readout__details__type">{{step_type}}</p>
+      <p class="timer-readout__details__time">{{formatMsAsMinSec current_time}}</p>
+    </div>
+    
+    {{#constant}}
+      <canvas class="timer-readout__graph js-active-timer-canvas" width="200" height="200"></canvas>
+    {{/constant}}
+  </div>
+</template>
