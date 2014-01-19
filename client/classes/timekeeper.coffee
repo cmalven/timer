@@ -98,6 +98,7 @@ class root.Timekeeper
       # Is the last step of the timer?
       if @_isLastStepOfTimer()
         console.log 'Timer Ended!'
+        Meteor.clearTimeout(@timeout)
         Meteor.call 'updateTimer', @timer._id,
           is_active: false
 
@@ -119,6 +120,7 @@ class root.Timekeeper
 
   _getStepForTime: (currentTime) =>
     set = _.where @timeline, {_id: @currentSet._id}
+    return unless set.length
     currentStep = _.find set[0].steps, (step) =>
       return false if currentTime < step.min
       return false if currentTime > step.max
