@@ -4,8 +4,8 @@ class root.Timekeeper
 
   constructor: (@options) ->
     @timer = Timers.find @options.timerId
-    @timerInterval = null
-    @updateInterval = 1000
+    @timeout = null
+    @updateInterval = 500
 
     # Update the state of the timer/sets/steps whenver they change
     @timer.observeChanges
@@ -53,13 +53,10 @@ class root.Timekeeper
         setObj.steps = []
 
         Steps.find({set_id: set._id}).forEach (step) =>
-          stepObj = {}
+          stepObj = step
           stepObj.min = elapsedTime
-          stepObj._id = step._id
-          stepObj.type = step.type
           elapsedTime += step.duration
           stepObj.max = elapsedTime
-          stepObj.duration = step.duration
           setObj.steps.push stepObj
 
         setObj.max = elapsedTime
@@ -68,19 +65,21 @@ class root.Timekeeper
 
   _updateTimerState: (id, fields) =>
     if fields.is_active
-      @timerInterval = Meteor.setInterval(
-        =>
-          @_updateTimerTime id
-      , @updateInterval)
+      @_updateTimerTime id
     else
-      Meteor.clearInterval(@timerInterval)
+      Meteor.clearTimeout(@timeout)
       if fields.started_at is null
         Session.set("current_timer_time", 0)
+
 
   _updateTimerTime: (id) =>
     timer = Timers.findOne(id)
     timeInMs = timer.elapsed_time_in_ms
     if timer.is_active
+      @timeout = Meteor.setTimeout(
+        =>
+          @_updateTimerTime id
+      , @updateInterval)
       timeInMs += moment().diff(timer.started_at, 'milliseconds')
       roundedTime = @_roundToThousand timeInMs
     Session.set("current_timer_time", roundedTime)
@@ -107,13 +106,16 @@ class root.Timekeeper
     return true unless @currentStep.position < setSteps.count() - 1
 
   _isLastStepOfTimer: =>
-    return true unless @currentStep.position < Steps.find().count() - 1
+    # XXX: This currently doesn't work, so it will always return true
+    # return true unless @_getStepForTime(@currentStep.max + 1)?
+    return true
 
   _getSetForTime: (currentTime) =>
     currentSet = _.find @timeline, (set) =>
       return false if currentTime < set.min
       return false if currentTime > set.max
       return true
+    return false unless currentSet?
     Session.set 'current_set', currentSet._id
     return currentSet
 
@@ -123,6 +125,7 @@ class root.Timekeeper
       return false if currentTime < step.min
       return false if currentTime > step.max
       return true
+    return false unless currentStep?
     Session.set 'current_step', currentStep._id
     return currentStep
 
