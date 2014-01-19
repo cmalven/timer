@@ -106,9 +106,7 @@ class root.Timekeeper
     return true unless @currentStep.position < setSteps.count() - 1
 
   _isLastStepOfTimer: =>
-    # XXX: This currently doesn't work, so it will always return true
-    # return true unless @_getStepForTime(@currentStep.max + 1)?
-    return true
+    return true unless @_getSetForTime(@currentStep.max + 1)
 
   _getSetForTime: (currentTime) =>
     currentSet = _.find @timeline, (set) =>
