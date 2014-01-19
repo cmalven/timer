@@ -28,7 +28,7 @@ Meteor.startup ->
     # Second Set
     
     set_id = Meteor.call 'addSet', timer_id,
-      repeats: 2
+      repeats: 1
       position: 1
 
     Meteor.call 'addStep', timer_id, set_id,
